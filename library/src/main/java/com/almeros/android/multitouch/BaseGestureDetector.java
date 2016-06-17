@@ -90,39 +90,40 @@ public abstract class BaseGestureDetector {
 
 
     protected void updateStateByEvent(MotionEvent curr) {
-        final MotionEvent prev = mCurrEvent;
+        if(curr != null) {
+            final MotionEvent prev = mCurrEvent;
 
-        // Reset mCurrEvent
-        if (mCurrEvent != null) {
-            mCurrEvent.recycle();
-            mCurrEvent = null;
-        }
-        mCurrEvent = MotionEvent.obtain(curr);
+            // Reset mCurrEvent
+            if (mCurrEvent != null) {
+                mCurrEvent.recycle();
+                mCurrEvent = null;
+            }
+            mCurrEvent = MotionEvent.obtain(curr);
 
-        // Focus
-        final boolean pointerUp = curr.getActionMasked() == MotionEvent.ACTION_UP;
-        final int skipIndex = pointerUp ? curr.getActionIndex() : -1;
-        final int count = curr.getPointerCount();
-        final int div = pointerUp ? count - 1 : count;
-        float sumX = 0, sumY = 0;
-        for (int i = 0; i < count; i++) {
-            if (skipIndex == i) continue;
-            sumX += curr.getX(i);
-            sumY += curr.getY(i);
-        }
-        mCurrFocusX = sumX / div;
-        mCurrFocusY = sumY / div;
+            // Focus
+            final boolean pointerUp = curr.getActionMasked() == MotionEvent.ACTION_UP;
+            final int skipIndex = pointerUp ? curr.getActionIndex() : -1;
+            final int count = curr.getPointerCount();
+            final int div = pointerUp ? count - 1 : count;
+            float sumX = 0, sumY = 0;
+            for (int i = 0; i < count; i++) {
+                if (skipIndex == i) continue;
+                sumX += curr.getX(i);
+                sumY += curr.getY(i);
+            }
+            mCurrFocusX = sumX / div;
+            mCurrFocusY = sumY / div;
 
 
-        if (prev != null) {
+            if (prev != null) {
+                // Pressure
+                mPrevPressure = prev.getPressure(prev.getActionIndex());
+                // Delta time
+                mTimeDelta = curr.getEventTime() - prev.getEventTime();
+            }
             // Pressure
-            mPrevPressure = prev.getPressure(prev.getActionIndex());
-            // Delta time
-            mTimeDelta = curr.getEventTime() - prev.getEventTime();
+            mCurrPressure = curr.getPressure(curr.getActionIndex());
         }
-        // Pressure
-        mCurrPressure = curr.getPressure(curr.getActionIndex());
-
     }
 
     /**
