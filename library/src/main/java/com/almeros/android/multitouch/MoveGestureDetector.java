@@ -124,25 +124,27 @@ public class MoveGestureDetector extends BaseGestureDetector {
     protected void updateStateByEvent(MotionEvent curr) {
         super.updateStateByEvent(curr);
 
-        final MotionEvent prev = mPrevEvent;
+        if (curr != null) {
+            final MotionEvent prev = mPrevEvent;
 
-        // Focus intenal
-        mCurrFocusInternal = determineFocalPoint(curr);
-        if (prev == null) {
-            mPrevFocusInternal = determineFocalPoint(curr);
-        } else {
-            mPrevFocusInternal = determineFocalPoint(prev);
+            // Focus intenal
+            mCurrFocusInternal = determineFocalPoint(curr);
+            if (prev == null) {
+                mPrevFocusInternal = determineFocalPoint(curr);
+            } else {
+                mPrevFocusInternal = determineFocalPoint(prev);
+            }
+
+            // Focus external
+            // - Prevent skipping of focus delta when a finger is added or removed
+            boolean mSkipNextMoveEvent = prev.getPointerCount() != curr.getPointerCount();
+            mFocusDeltaExternal = mSkipNextMoveEvent ? FOCUS_DELTA_ZERO : new PointF(mCurrFocusInternal.x - mPrevFocusInternal.x, mCurrFocusInternal.y - mPrevFocusInternal.y);
+
+            // - Don't directly use mFocusInternal (or skipping will occur). Add
+            // 	 unskipped delta values to mFocusExternal instead.
+            mFocusExternal.x += mFocusDeltaExternal.x;
+            mFocusExternal.y += mFocusDeltaExternal.y;
         }
-
-        // Focus external
-        // - Prevent skipping of focus delta when a finger is added or removed
-        boolean mSkipNextMoveEvent = prev.getPointerCount() != curr.getPointerCount();
-        mFocusDeltaExternal = mSkipNextMoveEvent ? FOCUS_DELTA_ZERO : new PointF(mCurrFocusInternal.x - mPrevFocusInternal.x, mCurrFocusInternal.y - mPrevFocusInternal.y);
-
-        // - Don't directly use mFocusInternal (or skipping will occur). Add 
-        // 	 unskipped delta values to mFocusExternal instead.
-        mFocusExternal.x += mFocusDeltaExternal.x;
-        mFocusExternal.y += mFocusDeltaExternal.y;
     }
 
     /**
