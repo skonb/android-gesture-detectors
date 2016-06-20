@@ -136,15 +136,18 @@ public class MoveGestureDetector extends BaseGestureDetector {
             }
 
             // Focus external
-            // - Prevent skipping of focus delta when a finger is added or removed
-            boolean mSkipNextMoveEvent = prev.getPointerCount() != curr.getPointerCount();
-            mFocusDeltaExternal = mSkipNextMoveEvent ? FOCUS_DELTA_ZERO : new PointF(mCurrFocusInternal.x - mPrevFocusInternal.x, mCurrFocusInternal.y - mPrevFocusInternal.y);
+            if (prev != null) {
+                // - Prevent skipping of focus delta when a finger is added or removed
+                boolean mSkipNextMoveEvent = prev.getPointerCount() != curr.getPointerCount();
+                mFocusDeltaExternal = mSkipNextMoveEvent ? FOCUS_DELTA_ZERO : new PointF(mCurrFocusInternal.x - mPrevFocusInternal.x, mCurrFocusInternal.y - mPrevFocusInternal.y);
 
-            // - Don't directly use mFocusInternal (or skipping will occur). Add
-            // 	 unskipped delta values to mFocusExternal instead.
-            mFocusExternal.x += mFocusDeltaExternal.x;
-            mFocusExternal.y += mFocusDeltaExternal.y;
+                // - Don't directly use mFocusInternal (or skipping will occur). Add
+                // 	 unskipped delta values to mFocusExternal instead.
+                mFocusExternal.x += mFocusDeltaExternal.x;
+                mFocusExternal.y += mFocusDeltaExternal.y;
+            }
         }
+
     }
 
     /**
