@@ -113,7 +113,9 @@ public class MoveGestureDetector extends BaseGestureDetector {
                 if (mCurrPressure / mPrevPressure > PRESSURE_THRESHOLD) {
                     final boolean updatePrevious = mListener.onMove(this);
                     if (updatePrevious) {
-                        mPrevEvent.recycle();
+                        if(mPrevEvent != null) {
+                            mPrevEvent.recycle();
+                        }
                         mPrevEvent = MotionEvent.obtain(event);
                     }
                 }
